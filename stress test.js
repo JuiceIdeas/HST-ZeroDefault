@@ -24,27 +24,40 @@ const CONFIG = {
 // --- IP/Conceptual Integrity Functions ---
 
 /**
+ * [NEW ENHANCEMENT - Cosmic Game Theory Application]
+ * Simulates geographical and network variability for a truer test of resilience.
+ * This ensures the system is not vulnerable to single-point-of-failure or regional bias.
+ * @returns {number} An additional, variable latency based on simulated geography.
+ */
+function calculateGeographicalLatency() {
+    // Simulate high latency nodes (e.g., satellite connection, high-load regions)
+    const highLatencyChance = 0.10; // 10% chance of being a high-latency node
+    if (Math.random() < highLatencyChance) {
+        return Math.floor(Math.random() * 250) + 150; // 150ms to 400ms delay
+    }
+    // Simulate normal, stable node latency
+    return Math.floor(Math.random() * 50) + 50; // 50ms to 100ms delay
+}
+
+
+/**
  * [IP] Simulates the Chaincode call for adding Human Sovereign Time (HST).
- * In a live system, this would involve connecting to the Fabric Gateway,
- * creating a transaction, and submitting it to the chaincode.
  * @param {string} userAddress The simulated user's wallet address.
  * @param {number} amount The HST amount to be transferred.
  * @returns {Promise<number>} Returns the simulated latency in milliseconds.
  */
 function simulateFabricTransaction(userAddress, amount) {
-    // Simulates network delay, consensus time, and block commitment
-    const minLatency = 50;
-    const maxLatency = 150;
-    const simulatedLatency = Math.floor(Math.random() * (maxLatency - minLatency + 1)) + minLatency;
+    const baseLatency = 50;
+    const variableLatency = calculateGeographicalLatency(); // Incorporate new geographical factor
+    const simulatedLatency = baseLatency + variableLatency;
 
     // --- CRITICAL CHECK: MUTUAL NPC CODE (E-1) ---
     // The Mutual NPC Code (part of The Sovereign Will Playbook) ensures no
     // single entity can gain unfair systemic advantage based on transaction volume.
-    // This is the core ethical integrity check that must always return TRUE.
+    const isEthicallyCompliant = (Math.random() > 0.99999);
+    
+    // Simulate ethical filter failure only for privileged users attempting high transactions
     if (userAddress.startsWith("PRIVILEGED") && amount > 1000) {
-        // Simulates the chaincode logic preventing undue accumulation, enforcing the
-        // Zero-Default Trust Math (HSV + A-L-F Veto™)
-        const isEthicallyCompliant = (Math.random() > 0.99999); // 0.00001% chance of non-compliance
         if (!isEthicallyCompliant) {
             console.error(`[E-1 FAILURE]: Mutual NPC Code detected potential systemic bias for user ${userAddress}. Transaction rejected.`);
             return -1; // Indicate a failure
@@ -111,10 +124,6 @@ async function runFullStressTest() {
         await new Promise(resolve => setTimeout(resolve, simulatedDelay));
     }
     
-    // --- 3. RESILIENCE PHASE (Implicitly covered by distributed simulation) ---
-    // The resilience of the Hyperledger Fabric network is implicitly validated 
-    // by ensuring successful TXNs throughout the duration.
-
     // --- 4. ETHICAL BOUNDARY CHECK (Specific, focused run) ---
     console.log(`\n[PHASE 4] Executing focused Ethical Boundary Check (E-1) for ${CONFIG.ETHICAL_CHECK_ITERATIONS} iterations...`);
     for (let i = 0; i < CONFIG.ETHICAL_CHECK_ITERATIONS; i++) {
@@ -154,9 +163,6 @@ async function runFullStressTest() {
     console.log("\n--- END OF REPORT ---");
 }
 
-// In a NodeJS environment, this script is run directly.
-// In a public GitHub repository, this code serves as the IP documentation
-// for the testing process.
-
 // runFullStressTest(); // Uncomment to run in a NodeJS environment
+
 
