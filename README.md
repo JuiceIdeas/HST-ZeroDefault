@@ -15,7 +15,7 @@ HST-ZeroDefault is a high-integrity, decentralized lending protocol designed by 
 Built on **Hyperledger Fabric** and validated through **Cosmic Game Theory**, this system utilizes **Trust Math** and the **A-L-F Veto™** to achieve zero-default lending for the **1.7B unbanked**. This repository contains the reference implementation and audit methodology proving systemic bias is non-existent under stress.
 
 ## Why HST-ZeroDefault?
-The financial future starts with equity. With **1.7 billion unbanked**, existing systems often favor collateral over creativity. This protocol ( https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/ethics.js ) provides the breakthrough: replacing trust bottlenecks with **trust math** to unlock global potential. Let’s convert **effort into sovereign currency.**
+The financial future starts with equity. With **1.7 billion unbanked**, existing systems often favor collateral over creativity. This protocol ** https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/ethics.js ** provides the breakthrough: replacing trust bottlenecks with **trust math** to unlock global potential. Let’s convert **effort into sovereign currency.**
 
 ## 🔥 Vision & Mission (The Human/Emotional Core)
 > "I always will have the forward mindset of eliminating inequality in the world." — Joshua Juice Ba Lacy, Sovereign Architect
