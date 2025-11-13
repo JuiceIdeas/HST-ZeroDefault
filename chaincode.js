@@ -1,28 +1,42 @@
 /*
-MIT License
+Royalty-Bearing Exclusive Software License Agreement
 
-Copyright (c) 2025 JuiceIdeas
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This Royalty-Bearing License Agreement ("Agreement") is entered into as of November 13, 2025 ("Effective Date"), between JuiceIdeas Co., with offices at 91824 haiamu st, ewa beach HI, 96706, ("Licensor"), and any user or entity ("Licensee") that obtains a copy of this software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+1. DEFINITIONS
+1.1 "Derivative Work" means any work based on the Software, including modifications, enhancements, or adaptations.
+1.2 "Net Sales" means the gross revenue received by Licensee from sales or licensing of the Software or Derivative Works, less documented deductions for returns, discounts, taxes, and shipping.
+1.3 "Software" means the HST Chaincode software provided under this Agreement.
+
+2. GRANT OF LICENSE
+Subject to the terms of this Agreement, Licensor grants Licensee a non-exclusive, royalty-bearing license to use, modify, reproduce, distribute, and create Derivative Works of the Software for commercial purposes. For non-commercial use (e.g., personal, educational), no royalties apply.
+
+3. ROYALTIES
+3.1 Licensee shall pay Licensor royalties equal to 5% of Net Sales from any commercial use, sale, or sublicensing of the Software or Derivative Works.
+3.2 Royalties are due quarterly, with reports on sales and calculations provided to Licensor at [your email].
+3.3 Minimum annual royalty: $1,000 starting from the first year of commercial use, creditable against sales-based royalties.
+3.4 For sublicensing, Licensee shall pay 25% of any upfront fees or non-sales revenue received from sublicensees.
+
+4. REPORTING AND AUDIT
+Licensee shall provide quarterly reports on sales and royalties. Licensor may audit records upon reasonable notice.
+
+5. TERM AND TERMINATION
+This Agreement is perpetual unless terminated for breach. Upon termination, Licensee must cease use and pay outstanding royalties.
+
+6. WARRANTY DISCLAIMER
+The Software is provided "AS IS" without warranties. Licensor is not liable for any damages.
+
+7. GOVERNING LAW
+Governed by the laws of Hawaii, US.
+
+For custom terms or questions, contact: JJBalacy@outlook.com. 
 */
 
 // HST v1.0 — Human-Sovereign-Time Chaincode
 // Zero-Default Lending | Mutual NPC Code | A-L-F Veto™
 // Architect: Joshua Juice Ba Lacy | JuicyIdeas Co.
-// Deployed: 2025-11-13 00:00 HST
+// Deployed: 2025-11-13
 
 'use strict';
 
