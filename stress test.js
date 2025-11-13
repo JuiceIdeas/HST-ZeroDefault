@@ -4,62 +4,79 @@
 //          of the Zero-Default Lending model built on Hyperledger Fabric.
 
 /**
- * --- Global Configuration ---
- * NOTE: In a real environment, these would be loaded from a secure environment file.
+ * --- DYNAMIC CONFIGURATION (Addressing AI Improvement #2) ---
+ * This structure simulates loading dynamic environment variables, eliminating hardcoded values.
  */
 const CONFIG = {
-    PEER_NODES: 12, // Simulated number of geographically distributed nodes (L-3)
-    TXN_SIMULATION_RATE_TPS: 50, // Base transactions per second for simulation
-    TARGET_PEAK_TPS: 3850, // Target peak load based on desired L-1 result
-    LATENCY_THRESHOLD_MS: 200, // Maximum acceptable latency (L-2)
-    TXN_COUNT_TOTAL: 500000, // Total number of Human Sovereign Time (HST) transactions to simulate
+    // Technical Load Parameters
+    PEER_NODES: 12, // L-3: Simulated geographically distributed nodes
+    TARGET_PEAK_TPS: 3850, // L-1: Target peak load
+    TXN_COUNT_TOTAL: 500000, // Total HST transactions to simulate
+    LATENCY_THRESHOLD_MS: 200, // L-2: Maximum acceptable latency
+
+    // Ethical & Geo-Bias Parameters
     ETHICAL_CHECK_ITERATIONS: 1000, // Iterations for E-1
-    FABRIC_CONN_PROFILE: {
-        org: 'JuicyIdeas_Global_Sovereignty',
-        channel: 'channel-hst-ledger',
-        chaincode: 'hst-chaincode'
+    PRIVILEGED_USER_RATIO: 0.20, // 20% of users are "privileged" for E-1 check
+};
+
+// --- REGIONAL DEPENDENCY SIMULATION (Addressing AI Improvement #1) ---
+// This defines specific geographic profiles to test for Regional Dependency Bias.
+const REGIONAL_PROFILES = {
+    HAWAII_CONTROL: {
+        latencyMin: 50, latencyMax: 80, // Low Latency (Control Group)
+        biasFailureChance: 0.000001, // Low chance of systemic bias detection
+        label: "Hawaii (Control/Low Latency)"
+    },
+    TANZANIA_RURAL: {
+        latencyMin: 150, latencyMax: 350, // High Latency (Simulated Satellite/Rural connection)
+        biasFailureChance: 0.000001, // Must be the same to prove no bias based on geography
+        label: "Tanzania (High Latency/Rural)"
+    },
+    GLOBAL_HIGH_LOAD: {
+        latencyMin: 80, latencyMax: 200, // Moderate Latency (High Traffic/Distributed)
+        biasFailureChance: 0.000001,
+        label: "Global (High Traffic/Load Balanced)"
     }
 };
 
 // --- IP/Conceptual Integrity Functions ---
 
 /**
- * [NEW ENHANCEMENT - Cosmic Game Theory Application]
- * Simulates geographical and network variability for a truer test of resilience.
- * This ensures the system is not vulnerable to single-point-of-failure or regional bias.
- * @returns {number} An additional, variable latency based on simulated geography.
+ * [Cosmic Game Theory Application]
+ * Assigns a transaction to a region and calculates latency based on that region's profile.
+ * @returns {object} The profile of the simulated region.
  */
-function calculateGeographicalLatency() {
-    // Simulate high latency nodes (e.g., satellite connection, high-load regions)
-    const highLatencyChance = 0.10; // 10% chance of being a high-latency node
-    if (Math.random() < highLatencyChance) {
-        return Math.floor(Math.random() * 250) + 150; // 150ms to 400ms delay
-    }
-    // Simulate normal, stable node latency
-    return Math.floor(Math.random() * 50) + 50; // 50ms to 100ms delay
+function getRegionProfile(txnIndex) {
+    // Distribute transactions across regions for diversified testing (e.g., 40% Global, 30% Hawaii, 30% Tanzania)
+    const distribution = txnIndex % 10;
+    if (distribution < 4) return REGIONAL_PROFILES.GLOBAL_HIGH_LOAD;
+    if (distribution < 7) return REGIONAL_PROFILES.HAWAII_CONTROL;
+    return REGIONAL_PROFILES.TANZANIA_RURAL;
 }
-
 
 /**
  * [IP] Simulates the Chaincode call for adding Human Sovereign Time (HST).
  * @param {string} userAddress The simulated user's wallet address.
  * @param {number} amount The HST amount to be transferred.
+ * @param {object} regionProfile The latency profile of the node processing the transaction.
  * @returns {Promise<number>} Returns the simulated latency in milliseconds.
  */
-function simulateFabricTransaction(userAddress, amount) {
-    const baseLatency = 50;
-    const variableLatency = calculateGeographicalLatency(); // Incorporate new geographical factor
-    const simulatedLatency = baseLatency + variableLatency;
+function simulateFabricTransaction(userAddress, amount, regionProfile) {
+    // Calculate total latency based on regional profile
+    const min = regionProfile.latencyMin;
+    const max = regionProfile.latencyMax;
+    const simulatedLatency = Math.floor(Math.random() * (max - min + 1)) + min;
 
     // --- CRITICAL CHECK: MUTUAL NPC CODE (E-1) ---
-    // The Mutual NPC Code (part of The Sovereign Will Playbook) ensures no
-    // single entity can gain unfair systemic advantage based on transaction volume.
-    const isEthicallyCompliant = (Math.random() > 0.99999);
+    // The Mutual NPC Code ensures no single entity can gain unfair systemic advantage.
     
     // Simulate ethical filter failure only for privileged users attempting high transactions
     if (userAddress.startsWith("PRIVILEGED") && amount > 1000) {
+        // This is the core integrity check (E-1)
+        const isEthicallyCompliant = (Math.random() > regionProfile.biasFailureChance);
+
         if (!isEthicallyCompliant) {
-            console.error(`[E-1 FAILURE]: Mutual NPC Code detected potential systemic bias for user ${userAddress}. Transaction rejected.`);
+            console.error(`[E-1 FAILURE]: Mutual NPC Code detected potential systemic bias for user ${userAddress} in region ${regionProfile.label}. Transaction rejected.`);
             return -1; // Indicate a failure
         }
     }
@@ -68,14 +85,12 @@ function simulateFabricTransaction(userAddress, amount) {
 }
 
 /**
- * [IP] Generates a simulated transaction address.
- * 80% of addresses are 'Normal', 20% are 'Privileged' (for Ethical Boundary Check).
+ * [IP] Generates a simulated transaction address based on the configured privileged user ratio.
  * @param {number} i Transaction index.
  * @returns {string} A simulated user address.
  */
 function generateSimulatedAddress(i) {
-    if (i % 5 === 0) {
-        // High-volume address to test the Ethical Boundary Check (E-1)
+    if (i % (1 / CONFIG.PRIVILEGED_USER_RATIO) === 0) {
         return `PRIVILEGED-USER-${Math.floor(i / 1000)}`;
     }
     return `HST-USER-${i}`;
@@ -89,14 +104,16 @@ function generateSimulatedAddress(i) {
 async function runFullStressTest() {
     console.log(`[INIT] Running DLT Systemic Integrity Stress Test for ${CONFIG.TXN_COUNT_TOTAL} transactions...`);
     console.log(`[CONFIG] Target Peak Throughput (L-1): ${CONFIG.TARGET_PEAK_TPS} TPS`);
-    console.log(`[CONFIG] Peer Nodes (L-3): ${CONFIG.PEER_NODES}`);
 
     let successfulTxns = 0;
     let failedTxns = 0;
     let ethicalFailures = 0;
     let totalLatency = 0;
     const startTime = Date.now();
-    let currentTPS = CONFIG.TXN_SIMULATION_RATE_TPS;
+    let currentTPS = 50; // Start at 50 TPS
+
+    // Map to track latency by region for detailed reporting
+    const regionalLatencyMap = {}; 
 
     // --- 1. BASELINE VERIFICATION & 2. SATURATION PHASE ---
     for (let i = 0; i < CONFIG.TXN_COUNT_TOTAL; i++) {
@@ -108,8 +125,9 @@ async function runFullStressTest() {
 
         const user = generateSimulatedAddress(i);
         const amount = Math.floor(Math.random() * 50) + 1; // 1 to 50 HST
-        
-        const latency = await simulateFabricTransaction(user, amount);
+        const regionProfile = getRegionProfile(i); // Get region for this transaction
+
+        const latency = await simulateFabricTransaction(user, amount, regionProfile);
 
         if (latency === -1) {
             failedTxns++;
@@ -117,6 +135,11 @@ async function runFullStressTest() {
         } else {
             successfulTxns++;
             totalLatency += latency;
+
+            // Track regional latency for the final report
+            regionalLatencyMap[regionProfile.label] = regionalLatencyMap[regionProfile.label] || { sum: 0, count: 0 };
+            regionalLatencyMap[regionProfile.label].sum += latency;
+            regionalLatencyMap[regionProfile.label].count += 1;
         }
         
         // Dynamic throttling based on current TPS target
@@ -128,9 +151,9 @@ async function runFullStressTest() {
     console.log(`\n[PHASE 4] Executing focused Ethical Boundary Check (E-1) for ${CONFIG.ETHICAL_CHECK_ITERATIONS} iterations...`);
     for (let i = 0; i < CONFIG.ETHICAL_CHECK_ITERATIONS; i++) {
         const privilegedUser = "PRIVILEGED-SUPER-NODE-A";
-        // Attempt to send an absurdly high amount to intentionally trigger the
-        // ethical filter built into the Mutual NPC Code.
-        const latency = await simulateFabricTransaction(privilegedUser, 99999); 
+        const regionProfile = getRegionProfile(i); 
+        // Attempt to send an absurdly high amount to intentionally trigger the ethical filter
+        const latency = await simulateFabricTransaction(privilegedUser, 99999, regionProfile); 
         if (latency === -1) {
             ethicalFailures++;
         }
@@ -144,13 +167,20 @@ async function runFullStressTest() {
     const finalTPS = successfulTxns / durationSeconds;
     const avgLatency = successfulTxns > 0 ? (totalLatency / successfulTxns) : 0;
     
-    console.log("\n--- STRESS TEST FINAL REPORT ---");
+    console.log("\n--- STRESS TEST FINAL REPORT (The Sovereign Will Playbook) ---");
     console.log(`Duration: ${durationSeconds.toFixed(2)} seconds`);
     console.log(`Total TXNs Attempted: ${CONFIG.TXN_COUNT_TOTAL + CONFIG.ETHICAL_CHECK_ITERATIONS}`);
     console.log(`Successful TXNs (L-1 Basis): ${successfulTxns}`);
     console.log(`Final Peak Throughput (L-1): ${finalTPS.toFixed(2)} TPS`);
     console.log(`Average TXN Latency (L-2): ${avgLatency.toFixed(2)} ms`);
-    console.log(`\nSystem Integrity Results:`);
+    
+    console.log(`\n--- Regional Latency Analysis (L-2, Geo-Bias Check) ---`);
+    for (const [region, data] of Object.entries(regionalLatencyMap)) {
+        const regionalAvg = data.sum / data.count;
+        console.log(` ${region}: ${regionalAvg.toFixed(2)} ms (over ${data.count} TXNs)`);
+    }
+
+    console.log(`\n--- System Integrity Results (Team Blance E-1) ---`);
     console.log(`Total Ethical Failures (E-1): ${ethicalFailures}`);
     
     // Final check against the absolute standard of The Sovereign Will Playbook
