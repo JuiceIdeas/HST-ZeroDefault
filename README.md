@@ -38,4 +38,4 @@ If your mission involves eliminating systemic inequality, building decentralized
 
 | 🔗 GitHub | 💼 JuicyIdeas Co. |
 | :---: | :---: |
-| [github.com/JuiceIdeas](https://github.com/JuiceIdeas) | [Connect with me]([Your Primary Contact Link]) |
+| [github.com/JuiceIdeas](https://github.com/JuiceIdeas) | 
