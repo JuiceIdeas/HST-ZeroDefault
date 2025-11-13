@@ -22,7 +22,8 @@ HST-ZeroDefault is an ethical, lightweight framework for building safe, autonomo
 Key files:
 - [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/ethics.js): Core ethical guidelines and utilities.
 - [See code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/stress%20test.js): Performance and stability tester.
-- `Sample.jsreact`: React component sample.
+- [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/Sample.jsreact
+): React component sample.
 - `demo.js`: Demo script.
 - `Sample.js`: Additional sample utility.
 
