@@ -53,7 +53,7 @@ The stress test validates resilience across all layers:
 | **L-2 (Latency)** | $200$ ms Threshold | $147.65$ ms Average Latency. |
 | **E-1 (Integrity)** | $0$ Ethical Failures | **✅ PASS** (Zero-Default Trust Confirmed). |
 
-- **JS Port (Console-Ready)**: Run \`node stress_test_harness.js\` for ASCII audit report, including regional latency bars and the ethical PASS/FAIL status. [See Code](https://github.com/JuiceIdeas/HST-ZeroDefault/blob/main/stress_test_harness.js).
+- **JS Port (Console-Ready)**: Run https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/stress%20test.js for ASCII audit report, including regional latency bars and the ethical PASS/FAIL status. [See Code](https://github.com/JuiceIdeas/HST-ZeroDefault/blob/main/stress_test_harness.js).
 
 ### Real-Life Applications
 The protocol is designed for immediate systemic transformation:
