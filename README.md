@@ -25,7 +25,7 @@ Key files:
 - [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/Sample.jsreact
 ): React component sample.
 - [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/demo.js): Demo script.
-- `Sample.js`: Additional sample utility.
+- [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/chaincode.js): ChainCode Concept.
 
 ## Installation
 
