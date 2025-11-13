@@ -100,6 +100,4 @@ High-integrity only:
 [![Stars](https://img.shields.io/github/stars/JuiceIdeas/HST-ZeroDefault?style=social)](https://github.com/JuiceIdeas/HST-ZeroDefault/stargazers)
 `;
 
-module.exports = {
-    README_MARKDOWN_CONTENT
-};
+}
