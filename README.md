@@ -32,7 +32,7 @@ As proprietor of JuicyIdeas Co., my focus is on robust, decentralized frameworks
 | :--- | :--- | :--- |
 | **The Sovereign Will Playbook** | Foundational architecture guiding disruptions via **Cosmic Game Theory** and **Mutual NPC Code**. | Establishes the ethical standard for **E-1 (Ethical Boundary Check)**. |
 | **HSV Trust Math** | Human-Subjective-Value scoring for bias-free credit allocation. | **$0$ Systemic Bias Failures** confirmed in 10K test runs. |
-| **A-L-F Veto™** | Autonomous Logic-Fact balance—immediately vetoes ethical failures (e.g., privileged bias). | Guaranteed compliance; the failure rate is $0\%$. [Request Code](https://github.com/JuiceIdeas) |
+| **A-L-F Veto™** | Autonomous Logic-Fact balance—immediately vetoes ethical failures (e.g., privileged bias). | Guaranteed compliance; the failure rate is $0\%$. [Request Code](https://github.com/JuiceIdeas/HST-ZeroDefault/blob/main/demo.js) |
 
 ### **SCAF-HST Adaptation Technical Summary**
 * **Tech Stack**: Hyperledger Fabric for immutable transactions, Celo for on-chain logs.
