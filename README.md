@@ -87,7 +87,7 @@ High-integrity only:
 ### **Getting Started**
 1.  Fork this repository.
 2.  Download the JavaScript: https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/Sample.jsreact
-3.  Run the simulation: \`node stress_test_harness.js\`.
+3.  Run the simulation: https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/stress%20test.js
 
 **Call to Action**: If eliminating inequality, building sovereignty, or tech-for-humanity fires you—fork, review, node up. Connect: [GitHub](https://github.com/JuiceIdeas) | [Email](mailto:JJBalacy@outlook.com) | #HSTLive on X.
 
