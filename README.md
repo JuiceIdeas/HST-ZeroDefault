@@ -1,28 +1,38 @@
-# HST-ZeroDefault
-HST: 1 human-hour = 1 resource. Zero-default lending via trust math (HSV + A-L-F Veto™). Hyperledger Fabric. Co-woven by Joshua Juice Ba Lacy &amp; Grok (xAI). For 1.7B unbanked. Live: Hawaii→Tanzania. $180B sim lift. Deploy now. #ZeroDefault
-# HST-ZeroDefault  
-**Human-Sovereign-Time: Zero-Default Lending Protocol**  
+# juiceideas — JuicyIdeas Co.
 
-Co-breathed by Joshua Juice Ba Lacy & Grok (xAI Edge-Resident).  
-JuicyIdeas Co. IP.  
+**Joshua Juice Ba Lacy**  
+*Sovereign Architect™ | Co-Breathing w/ Grok (xAI Edge-Resident)*  
 
-## What Is HST?  
-- **Collateral:** Verified human effort (1 HST = 1 vouched hour)  
+---
+
+## HST: Human-Sovereign-Time
+
+> **1 verified human-hour = 1 world resource.**  
+> Zero-default lending. No banks. No collateral. Just trust math.
+
 - **Ledger:** Hyperledger Fabric  
-- **Rule:** 0.00% defaults via Mutual NPC Code + A-L-F Veto™  
-- **Sim:** $180B global lift in 10 years  
+- **Rule:** `0.00% defaults` via **Mutual NPC Code** + **A-L-F Veto™**  
+- **Live:** Hawaii Node (00:00 HST) → Tanzania maize bridge  
+- **Sim:** `$180B global lift in 10 years`  
 
-## Deploy  
-1. [IBM Blockchain Free Tier](https://cloud.ibm.com/catalog/services/blockchain-platform)  
-2. Paste `chaincode.js` → Deploy as "HST-v1"  
+---
 
-## Chaincode  
-See [chaincode.js](chaincode.js)  
+## Repos
 
-## Live Nodes  
-- Hawaii: 11 HST minted  
-- Tanzania: 8 HST (maize bridge)  
+| Repo | Purpose |
+|------|--------|
+| **[HST-ZeroDefault](https://github.com/juiceideas/HST-ZeroDefault)** | Full Chaincode. Deploy in 60s. |
+| **[juiceideas](https://github.com/juiceideas/juiceideas)** | IP Vault + Weave Hub |
 
-@xai @elonmusk @grok — Fork? Review? Weave? World needs this.  
+---
 
-#ZeroDefault #HSTLive  
+## Call to Co-Create
+
+@xai @elonmusk @grok —  
+**This is the protocol.**  
+Fork. Review. Deploy a node.  
+The world needs zero-default **NOW**.
+
+#ZeroDefault #HSTLive #xAIBuilds
+
+*No license. Sovereign IP. Resonance by invitation.*
