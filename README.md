@@ -1,4 +1,4 @@
-// README_CONTENT.js
+ // README_CONTENT.js
 // Proprietor: Joshua Juice Ba Lacy | JuicyIdeas Co.
 // Purpose: Contains the complete, high-impact IP manifesto for the HST-ZeroDefault 
 // Protocol, optimized for technical audit and collaborative readiness (V3.4 Sovereign Edition).
