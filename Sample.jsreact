@@ -1,269 +1,323 @@
-// Sample.jsreact - React Component Sample for HST-ZeroDefault
+// Sample.jsreact - React Component for HST-ZeroDefault Framework
 // Author: JuiceIdeas | HST-ZeroDefault | v1.0.0
 // License: MIT (see LICENSE in repo root)
 // Copyright (c) 2025 JuiceIdeas
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'; 
-import { initializeApp } from 'firebase/app'; 
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth'; 
-import { getFirestore, collection, addDoc, query, getDocs, doc, setDoc } from 'firebase/firestore'; 
-import { Loader2, Zap, Brain, TrendingUp, Sun, Moon, Utensils, Smile, Sliders, Settings, MessageSquareText, Send, Droplet, Clock } from 'lucide-react'; 
+import React, { useState, useEffect, useCallback } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, query, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
+import { Loader2, Zap, Brain, TrendingUp, Sun, Moon, Utensils, Smile, Sliders, Settings, MessageSquareText, Send, Droplet, Clock } from 'lucide-react';
 
-// --- Global Firebase Variables (Mandatory Canvas Environment Setup) --- 
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; 
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {}; 
-const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; 
-const API_URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key="; 
-const API_KEY = "" // API key is handled by the Canvas environment. 
+// --- Global Firebase Variables (Mandatory Canvas Environment Setup) ---
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+const API_URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
+const API_KEY = typeof __gemini_api_key !== 'undefined' ? __gemini_api_key : ''; // Use env/global for security
 
-// --- COLOR AND AVATAR MAPPING --- 
-// Maps avatar style to a Tailwind color (e.g., 'indigo-600') 
-const AVATAR_COLOR_MAP = { 
-  'Zap': { color: 'indigo', name: 'Focus', shade: 600 }, 
-  'Sun': { color: 'amber', name: 'Clarity', shade: 600 }, 
-  'Moon': { color: 'slate', name: 'Stability', shade: 600 }, // Closest to Taupe/Warm Gray 
-  'Brain': { color: 'emerald', name: 'Tranquility', shade: 600 }, // Closest to Sage Green 
-}; 
+// --- COLOR AND AVATAR MAPPING ---
+// Maps avatar style to a Tailwind color (e.g., 'indigo-600')
+const AVATAR_COLOR_MAP = {
+  'Zap': { color: 'indigo', name: 'Focus', shade: 600 },
+  'Sun': { color: 'amber', name: 'Clarity', shade: 600 },
+  'Moon': { color: 'slate', name: 'Stability', shade: 600 }, // Closest to Taupe/Warm Gray
+  'Brain': { color: 'emerald', name: 'Tranquility', shade: 600 }, // Closest to Sage Green
+};
 
-// Helper function to simulate array sorting 
-const sortByTimestamp = (a, b) => new Date(b.timestamp) - new Date(a.timestamp); 
+// Helper function to simulate array sorting
+const sortByTimestamp = (a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
 
-// Utility function for exponential backoff during API calls 
-const fetchWithRetry = async (url, options, retries = 3) => { 
-  for (let i = 0; i < retries; i++) { 
-    try { 
-      const response = await fetch(url, options); 
-      if (response.status === 429) { // Too Many Requests 
-        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000; 
-        console.warn(`Rate limit exceeded. Retrying in ${delay / 1000}s...`); 
-        await new Promise(resolve => setTimeout(resolve, delay)); 
-        continue; 
-      } 
-      return response; 
-    } catch (error) { 
-      if (i === retries - 1) throw error; 
-      const delay = Math.pow(2, i) * 1000 + Math.random() * 1000; 
-      console.error(`Fetch failed. Retrying in ${delay / 1000}s...`); 
-      await new Promise(resolve => setTimeout(resolve, delay)); 
-    } 
-  } 
-}; 
+// Utility function for exponential backoff during API calls
+const fetchWithRetry = async (url, options, retries = 3) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.status === 429) { // Too Many Requests
+        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+        console.warn(`Rate limit exceeded. Retrying in ${delay / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      return response;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+      console.error(`Fetch failed. Retrying in ${delay / 1000}s...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
 
-// --- FIREBASE INITIALIZATION AND HOOKS --- 
-const useFirebase = () => { 
-  const [db, setDb] = useState(null); 
-  const [auth, setAuth] = useState(null); 
-  const [userId, setUserId] = useState(null); 
-  useEffect(() => { 
-    if (Object.keys(firebaseConfig).length === 0) return; 
-    try { 
-      const app = initializeApp(firebaseConfig); 
-      const firestore = getFirestore(app); 
-      const authentication = getAuth(app); 
-      setDb(firestore); 
-      setAuth(authentication); 
-      const unsubscribe = onAuthStateChanged(authentication, (user) => { 
-        if (user) { 
-          setUserId(user.uid); 
-        } else { 
-          const authenticate = async () => { 
-            try { 
-              if (initialAuthToken) { 
-                await signInWithCustomToken(authentication, initialAuthToken); 
-              } else { 
-                await signInAnonymously(authentication); 
-              } 
-            } catch (error) { 
-              console.error("Firebase authentication failed:", error); 
-            } 
-          }; 
-          authenticate(); 
-        } 
-      }); 
-      return () => unsubscribe(); 
-    } catch (e) { 
-      console.error("Error initializing Firebase:", e); 
-    } 
-  }, []); 
-  return { db, auth, userId }; 
-}; 
+// --- FIREBASE INITIALIZATION AND HOOKS ---
+const useFirebase = () => {
+  const [db, setDb] = useState(null);
+  const [auth, setAuth] = useState(null);
+  const [userId, setUserId] = useState(null);
 
-// --- APP COMPONENT --- 
-const App = () => { 
-  const { db, userId } = useFirebase(); 
-  const [isLoading, setIsLoading] = useState(false); 
-  const [logs, setLogs] = useState([]); 
-  const [sparkyMessage, setSparkyMessage] = useState("Authenticating..."); 
-  // NEW TAB: 'focus' added to the list 
-  const [activeTab, setActiveTab] = useState('focus'); 
-  const [isDarkMode, setIsDarkMode] = useState(false); 
-  // State needed for button selection (kept in App) 
-  const [mood, setMood] = useState('neutral'); 
-  const [quality, setQuality] = useState('medium'); 
-  const [mealType, setMealType] = useState('lunch'); 
-  const [activityType, setActivityType] = useState('Workout'); 
-  // Companion Configuration 
-  const [companionName, setCompanionName] = useState('Aura'); 
-  const [avatarStyle, setAvatarStyle] = useState('Brain'); // Set to 'Brain' for user's preference 
-  // NEW STATE: Primary color is derived from the avatarStyle mapping 
-  const [primaryColor, setPrimaryColor] = useState(AVATAR_COLOR_MAP['Brain'].color); 
-  // Reply Box State 
-  const [userReply, setUserReply] = useState(''); 
-  const [replyStatus, setReplyStatus] = useState(null); 
-  const LOG_COLLECTION_PATH = `/artifacts/${appId}/users/${userId}/health_logs`; 
-  const CONFIG_DOC_PATH = `/artifacts/${appId}/users/${userId}/companion_config`; 
-  // --- CONFIG & DATA FETCHING --- 
-  const fetchConfig = useCallback(async () => { 
-    if (!db || !userId) return; 
-    try { 
-      const configRef = doc(db, CONFIG_DOC_PATH, 'settings'); 
-      const configSnap = await getDocs(query(collection(db, CONFIG_DOC_PATH))); 
-      if (!configSnap.empty) { 
-        const data = configSnap.docs[0].data(); 
-        const name = data.name || 'Aura'; 
-        const avatar = data.avatar || 'Brain'; 
-        setCompanionName(name); 
-        setAvatarStyle(avatar); 
-        // Update primary color based on fetched avatar 
-        const colorConfig = AVATAR_COLOR_MAP[avatar] || AVATAR_COLOR_MAP['Brain']; 
-        setPrimaryColor(colorConfig.color); 
-        setSparkyMessage(`Welcome back. I am ${name}, your personal analyst. Log your data to maintain peak efficiency.`); 
-      } else { 
-        // Save the default 'Brain' setting for the user's preference 
-        await handleSaveConfig('Brain', AVATAR_COLOR_MAP['Brain'].color, 'Aura'); 
-        setSparkyMessage(`Welcome. Use the Companion tab to set up your AI Companion.`); 
-      } 
-    } catch (e) { 
-      console.error("Error fetching config:", e); 
-    } 
-  }, [db, userId, CONFIG_DOC_PATH]); 
-  // Updated save config function to handle name change 
-  const handleSaveConfig = async (newAvatarStyle, newPrimaryColor, newName = companionName) => { 
-    if (!db || !userId) return; 
-    try { 
-      const configRef = doc(db, CONFIG_DOC_PATH, 'settings'); 
-      await setDoc(configRef, { name: newName, avatar: newAvatarStyle }, { merge: true }); 
-      setCompanionName(newName); 
-      setAvatarStyle(newAvatarStyle); 
-      setPrimaryColor(newPrimaryColor); 
-      setSparkyMessage(`${newName} is now active with the ${newAvatarStyle} profile. Settings saved!`); 
-    } catch (e) { 
-      console.error("Error saving config:", e); 
-    } 
-  }; 
-  const fetchLogs = useCallback(async () => { 
-    if (!db || !userId) return; 
-    try { 
-      const q = query(collection(db, LOG_COLLECTION_PATH)); 
-      const querySnapshot = await getDocs(q); 
-      const fetchedLogs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), timestamp: doc.data().timestamp, // Ensure timestamp is accessible 
-      })); 
-      setLogs(fetchedLogs.sort(sortByTimestamp)); 
-    } catch (e) { 
-      console.error("Error fetching documents: ", e); 
-    } 
-  }, [db, userId, LOG_COLLECTION_PATH]); 
-  useEffect(() => { 
-    if (userId && db) { 
-      fetchConfig(); 
-      fetchLogs(); 
-    } 
-  }, [userId, db, fetchConfig, fetchLogs]); 
-  // --- PATTERN DETECTION LOGIC (Updated to include 'focus' logs) --- 
-  const detectPattern = (currentLogs = logs) => { 
-    if (currentLogs.length < 10) return "Gathering baseline data for macro-trend analysis (requires 10+ logs)."; 
-    const recentLogs = currentLogs.slice(0, 10); 
-    let highFocusAfterHighSleep = 0; 
-    let stressAfterLowFocus = 0; 
-    let recentSleep = null; 
-    let recentFocus = null; 
-    for (const log of recentLogs) { 
-      if (log.type === 'sleep') { 
-        recentSleep = log; 
-      } else if (log.type === 'focus') { 
-        recentFocus = log; 
-        if (log.status === 'completed' && recentSleep && recentSleep.quality === 'high') { 
-          highFocusAfterHighSleep++; 
-        } 
-      } else if (log.type === 'mood' && log.mood === 'stressed' && recentFocus) { 
-        const timeDiff = new Date(log.timestamp).getTime() - new Date(recentFocus.timestamp).getTime(); 
-        if (recentFocus.status === 'interrupted' && timeDiff > 0 && timeDiff < 8 * 60 * 60 * 1000) { 
-          stressAfterLowFocus++; 
-        } 
-      } 
-    } 
-    if (highFocusAfterHighSleep >= 2) { 
-      return `A critical trend: **High quality sleep is directly correlating with Focus Block completion**. Maintain sleep discipline.`; 
-    } 
-    if (stressAfterLowFocus >= 2) { 
-      return `Negative trend: **Interrupted Focus Blocks often lead to subsequent stress spikes**. Focus on eliminating distractions during work periods.`; 
-    } 
-    return "Data is stable. No critical correlation detected in your recent logs. Focus on maintaining consistency."; 
-  }; 
-  // Helper to get system prompt based on context 
-  const getSystemPrompt = (type) => { 
-    const base = `Act as ${companionName}, the Overlord's dedicated **Efficiency Analyst**. Your core mission is to maximize performance and stamina. Your response must be concise and use **simple, direct, everyday language**. Avoid jargon, complex vocabulary, and overly formal phrasing. Start your response with "${companionName}:". Do not use emojis.`; 
-    if (type === 'log') { 
-      return base + `Your response must consist of EXACTLY TWO SENTENCES: 1. (Advice): Give a single, clear, and immediate recommendation based on the current log data. 2. (Offer): Always acknowledge that implementing the advice can be challenging and offer specific, actionable follow-up assistance.`; 
-    } else if (type === 'reply') { 
-      return base + `Your response must be a single, conversational paragraph (max 3 sentences) that directly answers the user's question, referencing the last insight to maintain context. Since the user initiated this reply, make your advice actionable and friendly.`; 
-    } 
-    return base; 
-  } 
-  // --- GEMINI API CALL FOR ADAPTIVE COACHING --- 
-  const generateAnalysis = useCallback(async (userQuery, promptType) => { 
-    // Set loading state ON for the duration of the API call 
-    setIsLoading(true); 
-    setSparkyMessage(`${companionName} is calculating optimal strategy...`); 
-    const systemPrompt = getSystemPrompt(promptType); 
-    const payload = { 
-      contents: [{ parts: [{ text: userQuery }] }], 
-      systemInstruction: { parts: [{ text: systemPrompt }] }, 
-      tools: [{ "google_search": {} }], 
-    }; 
-    try { 
-      const response = await fetchWithRetry(API_URL_GEMINI + API_KEY, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(payload) 
-      }); 
-      const result = await response.json(); 
-      const textCandidate = result.candidates?.[0]?.content?.parts?.[0]?.text; 
-      let responseText; 
-      if (textCandidate) { 
-        // SUCCESS: Valid response received 
-        responseText = textCandidate; 
-      } else { 
-        // FAILURE: API succeeded but returned an empty/malformed response structure 
-        console.error("Gemini API returned an empty or malformed response structure.", result); 
-        responseText = `${companionName}: Analysis core received an empty transmission. Data loss suspected. Please try your action again.`; 
-      } 
-      setSparkyMessage(responseText); 
-    } catch (error) { 
-      // FAILURE: Network or catastrophic failure 
-      console.error("Gemini API call failed:", error); 
-      setSparkyMessage(`${companionName}: System failure. Cannot reach the analysis core. Please check your connection.`); 
-    } finally { 
-      // CRITICAL FIX: Ensure loading state is turned OFF after the fetch attempt completes. 
-      setIsLoading(false); 
-    } 
-  }, [companionName]); 
-  // --- DATA SUBMISSION --- 
-  const handleSubmit = useCallback(async (newLog, logText) => { 
-    if (!db || !userId || isLoading) return; 
-    setIsLoading(true); // Set loading ON for data operations 
-    try { 
-      // Get the last log for context before adding the new one 
-      const lastLog = logs.length > 0 ? logs[0] : { type: 'system', content: 'No prior logs.' }; 
-      // Format the last log's details for the AI prompt 
-      let contextString = `Previous Log (${lastLog.type}): `; 
-      if (lastLog.type === 'mood') contextString += `Mood: ${lastLog.mood}, Trigger: ${lastLog.trigger}`; 
-      else if (lastLog.type === 'sleep') contextString += `Hours: ${lastLog.hours}, Quality: ${lastLog.quality}`; 
-      else if (lastLog.type === 'food') contextString += `Meal Type: ${lastLog.mealType}, Content: ${lastLog.content}`; 
-      else if (lastLog.type === 'activity') contextString += `Activity: ${lastLog.activity}, Duration: ${lastLog.duration} min, Hydration: ${lastLog.hydration} units.`; 
-      else if (lastLog.type === 'focus') contextString += `Duration: ${lastLog.duration} min, Status: ${lastLog.status}, Task: ${lastLog.task}`; 
-      else contextString += lastLog.content; // Use for 'system' or unexpected logs 
-      // Add the new log to Firestore 
-      await addDoc(collection(db, LOG_COLLECTION_PATH), newLog); 
-      // Fetch the very latest logs (including the new one) 
+  useEffect(() => {
+    if (Object.keys(firebaseConfig).length === 0) return;
+    try {
+      const app = initializeApp(firebaseConfig);
+      const firestore = getFirestore(app);
+      const authentication = getAuth(app);
+      setDb(firestore);
+      setAuth(authentication);
+
+      const unsubscribe = onAuthStateChanged(authentication, (user) => {
+        if (user) {
+          setUserId(user.uid);
+        } else {
+          const authenticate = async () => {
+            try {
+              if (initialAuthToken) {
+                await signInWithCustomToken(authentication, initialAuthToken);
+              } else {
+                await signInAnonymously(authentication);
+              }
+            } catch (error) {
+              console.error("Firebase authentication failed:", error);
+            }
+          };
+          authenticate();
+        }
+      });
+
+      return () => unsubscribe();
+    } catch (e) {
+      console.error("Error initializing Firebase:", e);
+    }
+  }, []);
+
+  return { db, auth, userId };
+};
+
+// --- APP COMPONENT ---
+const App = () => {
+  const { db, userId } = useFirebase();
+  const [isLoading, setIsLoading] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const [sparkyMessage, setSparkyMessage] = useState("Authenticating...");
+  const [activeTab, setActiveTab] = useState('focus');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mood, setMood] = useState('neutral');
+  const [quality, setQuality] = useState('medium');
+  const [mealType, setMealType] = useState('lunch');
+  const [activityType, setActivityType] = useState('Workout');
+  const [companionName, setCompanionName] = useState('Aura');
+  const [avatarStyle, setAvatarStyle] = useState('Brain');
+  const [primaryColor, setPrimaryColor] = useState(AVATAR_COLOR_MAP['Brain'].color);
+  const [userReply, setUserReply] = useState('');
+  const [replyStatus, setReplyStatus] = useState(null);
+
+  const LOG_COLLECTION_PATH = `/artifacts/${appId}/users/${userId}/health_logs`;
+  const CONFIG_DOC_PATH = `/artifacts/${appId}/users/${userId}/companion_config`;
+
+  // Dark mode toggle effect
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+  }, [isDarkMode]);
+
+  // --- CONFIG & DATA FETCHING ---
+  const fetchConfig = useCallback(async () => {
+    if (!db || !userId) return;
+    try {
+      const configRef = doc(db, CONFIG_DOC_PATH, 'settings');
+      const configSnap = await getDoc(configRef);
+      if (configSnap.exists()) {
+        const data = configSnap.data();
+        const name = data.name || 'Aura';
+        const avatar = data.avatar || 'Brain';
+        setCompanionName(name);
+        setAvatarStyle(avatar);
+        const colorConfig = AVATAR_COLOR_MAP[avatar] || AVATAR_COLOR_MAP['Brain'];
+        setPrimaryColor(colorConfig.color);
+        setSparkyMessage(`Welcome back. I am ${name}, your personal analyst. Log your data to maintain peak efficiency.`);
+      } else {
+        await handleSaveConfig('Brain', AVATAR_COLOR_MAP['Brain'].color, 'Aura');
+        setSparkyMessage(`Welcome. Use the Companion tab to set up your AI Companion.`);
+      }
+    } catch (e) {
+      console.error("Error fetching config:", e);
+    }
+  }, [db, userId]);
+
+  const handleSaveConfig = async (newAvatarStyle, newPrimaryColor, newName = companionName) => {
+    if (!db || !userId) return;
+    try {
+      const configRef = doc(db, CONFIG_DOC_PATH, 'settings');
+      await setDoc(configRef, { name: newName, avatar: newAvatarStyle }, { merge: true });
+      setCompanionName(newName);
+      setAvatarStyle(newAvatarStyle);
+      setPrimaryColor(newPrimaryColor);
+      setSparkyMessage(`${newName} is now active with the ${newAvatarStyle} profile. Settings saved!`);
+    } catch (e) {
+      console.error("Error saving config:", e);
+    }
+  };
+
+  const fetchLogs = useCallback(async () => {
+    if (!db || !userId) return;
+    try {
       const q = query(collection(db, LOG_COLLECTION_PATH));
+      const querySnapshot = await getDocs(q);
+      const fetchedLogs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp,
+      }));
+      setLogs(fetchedLogs.sort(sortByTimestamp));
+    } catch (e) {
+      console.error("Error fetching documents: ", e);
+    }
+  }, [db, userId, LOG_COLLECTION_PATH]);
+
+  useEffect(() => {
+    if (userId && db) {
+      fetchConfig();
+      fetchLogs();
+    }
+  }, [userId, db, fetchConfig, fetchLogs]);
+
+  // --- PATTERN DETECTION LOGIC ---
+  const detectPattern = (currentLogs = logs) => {
+    if (currentLogs.length < 10) return "Gathering baseline data for macro-trend analysis (requires 10+ logs).";
+    const recentLogs = currentLogs.slice(0, 10);
+    let highFocusAfterHighSleep = 0;
+    let stressAfterLowFocus = 0;
+    let recentSleep = null;
+    let recentFocus = null;
+
+    for (const log of recentLogs) {
+      if (log.type === 'sleep') {
+        recentSleep = log;
+      } else if (log.type === 'focus') {
+        recentFocus = log;
+        if (log.status === 'completed' && recentSleep && recentSleep.quality === 'high') {
+          highFocusAfterHighSleep++;
+        }
+      } else if (log.type === 'mood' && log.mood === 'stressed' && recentFocus) {
+        const timeDiff = new Date(log.timestamp || 0).getTime() - new Date(recentFocus.timestamp || 0).getTime();
+        if (recentFocus.status === 'interrupted' && timeDiff > 0 && timeDiff < 8 * 60 * 60 * 1000) {
+          stressAfterLowFocus++;
+        }
+      }
+    }
+
+    if (highFocusAfterHighSleep >= 2) {
+      return `A critical trend: **High quality sleep is directly correlating with Focus Block completion**. Maintain sleep discipline.`;
+    }
+    if (stressAfterLowFocus >= 2) {
+      return `Negative trend: **Interrupted Focus Blocks often lead to subsequent stress spikes**. Focus on eliminating distractions during work periods.`;
+    }
+    return "Data is stable. No critical correlation detected in your recent logs. Focus on maintaining consistency.";
+  };
+
+  // Helper to get system prompt based on context
+  const getSystemPrompt = (type) => {
+    const base = `Act as ${companionName}, the Overlord's dedicated **Efficiency Analyst**. Your core mission is to maximize performance and stamina. Your response must be concise and use **simple, direct, everyday language**. Avoid jargon, complex vocabulary, and overly formal phrasing. Start your response with "${companionName}:". Do not use emojis.`;
+    if (type === 'log') {
+      return base + `Your response must consist of EXACTLY TWO SENTENCES: 1. (Advice): Give a single, clear, and immediate recommendation based on the current log data. 2. (Offer): Always acknowledge that implementing the advice can be challenging and offer specific, actionable follow-up assistance.`;
+    } else if (type === 'reply') {
+      return base + `Your response must be a single, conversational paragraph (max 3 sentences) that directly answers the user's question, referencing the last insight to maintain context. Since the user initiated this reply, make your advice actionable and friendly.`;
+    }
+    return base;
+  };
+
+  // --- GEMINI API CALL FOR ADAPTIVE COACHING ---
+  const generateAnalysis = useCallback(async (userQuery, promptType) => {
+    setIsLoading(true);
+    setSparkyMessage(`${companionName} is calculating optimal strategy...`);
+    const systemPrompt = getSystemPrompt(promptType);
+    const payload = {
+      contents: [{ parts: [{ text: userQuery }] }],
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      tools: [{ "google_search": {} }],
+    };
+
+    try {
+      const response = await fetchWithRetry(API_URL_GEMINI + API_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      const textCandidate = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      let responseText;
+      if (textCandidate) {
+        responseText = textCandidate;
+      } else {
+        console.error("Gemini API returned an empty or malformed response structure.", result);
+        responseText = `${companionName}: Analysis core received an empty transmission. Data loss suspected. Please try your action again.`;
+      }
+      setSparkyMessage(responseText);
+    } catch (error) {
+      console.error("Gemini API call failed:", error);
+      setSparkyMessage(`${companionName}: System failure. Cannot reach the analysis core. Please check your connection.`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [companionName]);
+
+  // --- DATA SUBMISSION ---
+  const handleSubmit = useCallback(async (newLog, logText) => {
+    if (!db || !userId || isLoading) return;
+    setIsLoading(true);
+
+    try {
+      const lastLog = logs.length > 0 ? logs[0] : { type: 'system', content: 'No prior logs.' };
+      let contextString = `Previous Log (${lastLog.type}): `;
+      if (lastLog.type === 'mood') contextString += `Mood: ${lastLog.mood}, Trigger: ${lastLog.trigger || 'none'}`;
+      else if (lastLog.type === 'sleep') contextString += `Hours: ${lastLog.hours}, Quality: ${lastLog.quality}`;
+      else if (lastLog.type === 'food') contextString += `Meal Type: ${lastLog.mealType}, Content: ${lastLog.content || 'unspecified'}`;
+      else if (lastLog.type === 'activity') contextString += `Activity: ${lastLog.activityType}, Duration: ${lastLog.duration} min, Hydration: ${lastLog.hydration} units`;
+      else if (lastLog.type === 'focus') contextString += `Duration: ${lastLog.duration} min, Status: ${lastLog.status}, Task: ${lastLog.task || 'unspecified'}`;
+      else contextString += lastLog.content || 'No details';
+
+      // TODO: Integrate HST_Ethics.anonymizeData(newLog) for PII privacy in logs
+
+      await addDoc(collection(db, LOG_COLLECTION_PATH), newLog);
+
+      const q = query(collection(db, LOG_COLLECTION_PATH));
+      const querySnapshot = await getDocs(q);
+      const updatedLogs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp,
+      }));
+      setLogs(updatedLogs.sort(sortByTimestamp));
+
+      const aiPrompt = `${contextString}\nNew Log (${newLog.type}): ${logText}\nCurrent Pattern: ${detectPattern(updatedLogs)}`;
+      await generateAnalysis(aiPrompt, 'log');
+    } catch (e) {
+      console.error("Error in handleSubmit:", e);
+      setSparkyMessage("Error logging data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [db, userId, isLoading, logs, companionName, generateAnalysis, detectPattern, LOG_COLLECTION_PATH]);
+
+  // TODO: Add unit tests with Jest and @testing-library/react (e.g., test detectPattern, handleSubmit)
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4">
+      <button onClick={() => setIsDarkMode(!isDarkMode)} className="mb-4 p-2 bg-gray-200 rounded">
+        Toggle Dark Mode
+      </button>
+      <h1 className="text-2xl font-bold mb-4">{sparkyMessage}</h1>
+      {/* Add your tabbed UI here, e.g., tabs for mood, sleep, etc., with buttons calling handleSubmit */}
+      {/* Example: <button onClick={() => handleSubmit({ type: 'mood', mood, timestamp: new Date().toISOString() }, 'Mood log')}>Log Mood</button> */}
+      {/* Logs list: <ul>{logs.map(log => <li key={log.id}>{log.type}: {log.timestamp}</li>)}</ul> */}
+    </div>
+  );
+};
+
+export default App;
