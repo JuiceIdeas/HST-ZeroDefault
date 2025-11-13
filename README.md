@@ -98,6 +98,3 @@ High-integrity only:
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 [![Forks](https://img.shields.io/github/forks/JuiceIdeas/HST-ZeroDefault?style=social)](https://github.com/JuiceIdeas/HST-ZeroDefault/network/members)  
 [![Stars](https://img.shields.io/github/stars/JuiceIdeas/HST-ZeroDefault?style=social)](https://github.com/JuiceIdeas/HST-ZeroDefault/stargazers)
-`;
-
-}
