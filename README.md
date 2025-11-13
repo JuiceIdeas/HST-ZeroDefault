@@ -29,5 +29,4 @@ Key files:
 ## Installation
 
 ### Browser
-```html
-<script src="https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/ethics.js"></script>
+https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/ethics.js 
