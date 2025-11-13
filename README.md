@@ -7,7 +7,7 @@
 
 ### **🔥 Vision & Mission (The Human/Emotional Core)**
 
-> "I always will have the forward mindset of eliminating inequality in the world."
+> "(my wording sucks so yes i had ai write this) I always will have the forward mindset of eliminating inequality in the world."
 
 We operate at the intersection of **Cosmic Game Theory** and **High-Integrity Collaboration**, working to dismantle systemic bias and build equitable futures. My work is not just about code or concepts—it is about realizing **subjective value over objective fact** to unlock true human potential.
 
@@ -38,4 +38,4 @@ If your mission involves eliminating systemic inequality, building decentralized
 
 | 🔗 GitHub | 💼 JuicyIdeas Co. |
 | :---: | :---: |
-| [github.com/JuiceIdeas](https://github.com/JuiceIdeas) | 
+| [github.com/JuiceIdeas](https://github.com/JuiceIdeas) | JJBalacy@outlook.com 
