@@ -24,7 +24,7 @@ Key files:
 - [See code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/stress%20test.js): Performance and stability tester.
 - [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/Sample.jsreact
 ): React component sample.
-- `demo.js`: Demo script.
+- [See Code](https://raw.githubusercontent.com/JuiceIdeas/HST-ZeroDefault/main/demo.js): Demo script.
 - `Sample.js`: Additional sample utility.
 
 ## Installation
