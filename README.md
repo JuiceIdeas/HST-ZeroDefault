@@ -6,7 +6,7 @@
 const README_MARKDOWN_CONTENT = `
 # ⚡️ HST-ZeroDefault: Sovereign Zero-Default Lending Protocol
 
-![Dashboard Preview](https://via.placeholder.com/800x400?text=SCAF-HST+Live+Dashboard+Coming+Soon)  
+!
 *Live visualization of trust math in action—particles flowing from Hawaii to Tanzania. [https://github.com/JuiceIdeas/HST-ZeroDefault/blob/main/stress%20test.js](dashboard.html)
 ## 💡 Project Overview & Mission
 HST-ZeroDefault is a high-integrity, decentralized lending protocol designed by **JuicyIdeas Co.** to eliminate systemic financial inequality. It operates on the core principle of **Human Sovereign Time (HST)**, ensuring **1 human-hour = 1 world resource**.
